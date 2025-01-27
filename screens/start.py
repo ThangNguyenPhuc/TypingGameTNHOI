@@ -7,7 +7,7 @@ pygame.init()
 # Thiết lập cửa sổ hiển thị với kích thước 1000x800
 screen_width, screen_height = 1000, 800
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Main Menu")
+pygame.display.set_caption("TYPING ARMADA")
 
 # Class Button với hình ảnh và bo tròn góc
 class Button:
