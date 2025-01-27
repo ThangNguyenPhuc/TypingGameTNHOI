@@ -1,32 +1,40 @@
 import pygame 
 import sys
 from assets.components.Button import Button
-
+from screens.Battle import BattleScreen
 
 pygame.init()
+pygame.key.set_repeat(200, 10)
 
-#Initialize screen
-screen = pygame.display.set_mode((1000, 600))
+#Initialize clock
+clock = pygame.time.Clock()
+
+#Initialize window
+screen = pygame.display.set_mode((1000, 800))
 pygame.display.set_caption("TYPING ARMADA")
 
-#Set start background
-background_img = pygame.image.load("assets\images\start-background.jpg")
-background_img = pygame.transform.smoothscale(background_img, (screen.get_width(), screen.get_height()))
 
-sample_button = Button(450, 250, 200, 100)
+#Initialize screens
+BATTLE = BattleScreen(screen)
+
+
 
 #Game run
 run = True
-
 while run:
-    screen.blit(background_img, (0, 0))
-    sample_button.draw(screen)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             run = False
+
+    BATTLE.draw()
+    BATTLE.handleKeyType()
+
+    
     pygame.display.flip()
+    clock.tick(60)
 
 pygame.quit()
 sys.exit()
