@@ -49,8 +49,8 @@ def quit_action():
 
 # Tải các hình ảnh cho các nút
 play_image = pygame.image.load("assets/images/button images/battle-button.png")  # Thay thế đường dẫn thực tế
-settings_image = pygame.image.load("assets/images/button images/guide-button.png")  # Thay thế đường dẫn thực tế
-guide_image = pygame.image.load("assets/images/button images/settings-button.png")  # Thay thế đường dẫn thực tế
+settings_image = pygame.image.load("assets/images/button images/settings-button.png")  # Thay thế đường dẫn thực tế
+guide_image = pygame.image.load("assets/images/button images/guide-button.png")  # Thay thế đường dẫn thực tế
 quit_image = pygame.image.load("assets/images/button images/quit-button.png")  # Thay thế đường dẫn thực tế
 
 # Tải hình ảnh nền
