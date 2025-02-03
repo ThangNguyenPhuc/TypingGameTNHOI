@@ -15,7 +15,7 @@ pygame.display.set_caption("TYPING ARMADA")
 
 #Battle Screen Customize Events
 ADDENEMY = pygame.USEREVENT + 1
-pygame.time.set_timer(ADDENEMY, 2000)
+pygame.time.set_timer(ADDENEMY, 4000)
 
 
 #Initialize screens
@@ -36,7 +36,7 @@ while run:
             BATTLE.spawnEnemy()
 
     curTime = pygame.time.get_ticks() / 1000
-
+    
     BATTLE.draw()
     BATTLE.handleEvents(events)
 
