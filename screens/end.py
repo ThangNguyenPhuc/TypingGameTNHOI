@@ -11,6 +11,9 @@ pygame.display.set_caption("TYPING ARMADA")
 class Print_Score: 
     def __init__(self, score): 
         self.score = score
+    def printscore(self): 
+        screen.blit(self.score)  
+ 
 
 class Button:
     def __init__(self, x, y, image, action):
