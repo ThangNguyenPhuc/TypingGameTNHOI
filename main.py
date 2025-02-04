@@ -2,6 +2,8 @@ import pygame
 import sys
 from screens.Start import StartScreen
 from screens.Battle import BattleScreen
+from screens.Pause import PauseScreen
+
 
 pygame.init()
 pygame.key.set_repeat(300, 100)
@@ -21,10 +23,12 @@ pygame.time.set_timer(ADDENEMY, 4000)
 #Initialize screens
 START = StartScreen(screen)
 BATTLE = BattleScreen(screen)
+PAUSE = PauseScreen(screen)
 
 screenList = {
     "start" : START,
-    "battle" : BATTLE
+    "battle" : BATTLE,
+    "pause" : PAUSE
 }
 
 curScreen = START
@@ -48,9 +52,9 @@ while run:
     if curScreen.switchScreen == "quit":
         run = False
 
-    if curScreen.switchScreen == "battle":
-        curScreen = screenList["battle"]
+    curScreen = screenList[curScreen.switchScreen]
     
+
     curScreen.draw()
     curScreen.handleEvents(events)
 
