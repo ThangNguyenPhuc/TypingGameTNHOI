@@ -67,6 +67,9 @@ class BattleScreen:
             self.glossaries[0][idx] = self.glossaries[0][idx][:-1]
 
 
+        self.switchScreen = "battle"
+
+
     def draw(self):
         self.screen.blit(self.backgroundImage, (0, 0))
 
