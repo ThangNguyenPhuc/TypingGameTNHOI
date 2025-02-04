@@ -1,6 +1,6 @@
 import pygame 
 import sys
-from assets.components.Button import Button
+from screens.Start import StartScreen
 from screens.Battle import BattleScreen
 
 pygame.init()
@@ -19,8 +19,15 @@ pygame.time.set_timer(ADDENEMY, 4000)
 
 
 #Initialize screens
+START = StartScreen(screen)
 BATTLE = BattleScreen(screen)
 
+screenList = {
+    "start" : START,
+    "battle" : BATTLE
+}
+
+curScreen = START
 
 #Game run
 run = True
@@ -32,13 +39,20 @@ while run:
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             run = False
 
-        if event.type == ADDENEMY:
-            BATTLE.spawnEnemy()
+        if curScreen == BATTLE and event.type == ADDENEMY:
+            curScreen.spawnEnemy()
 
     curTime = pygame.time.get_ticks() / 1000
+
+    #Switch screen
+    if curScreen.switchScreen == "quit":
+        run = False
+
+    if curScreen.switchScreen == "battle":
+        curScreen = screenList["battle"]
     
-    BATTLE.draw()
-    BATTLE.handleEvents(events)
+    curScreen.draw()
+    curScreen.handleEvents(events)
 
     
     pygame.display.flip()
