@@ -20,6 +20,7 @@ class EndScreen:
     
     def draw(self, score):
         game_title_image = pygame.image.load("assets/images/name-game.png")
+        font = pygame.font.Font("assets/fonts/Montserrat-ExtraBold.ttf", 45)
         SCORE = font.render(str(score), True, (17, 98, 132))
         #Draw background and game title
         self.screen.blit(self.background_image, (0, 0)) 
