@@ -13,14 +13,15 @@ class Button:
 class EndScreen: 
     def __init__(self, screen):
         self.screen = screen
-        self.background_image = pygame.image.load("assets/images/end-background.jpg")
+        self.background_image = pygame.image.load("assets/images/end-background.png")
         self.background_image = pygame.transform.scale(self.background_image, (1000, 800))
         self.switchScreen = "end"
-        #self.score = score
+        self.score = None
     
-    def draw(self, score):
-        game_title_image = pygame.image.load("assets/images/name-game.png")
-        SCORE = font.render(str(score), True, (17, 98, 132))
+    def draw(self):
+        font = pygame.font.SysFont("Arial", 40)
+        SCORE = font.render(str(self.score), True, (17, 98, 132))
+
         #Draw background and game title
         self.screen.blit(self.background_image, (0, 0)) 
         

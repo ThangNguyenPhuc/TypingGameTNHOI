@@ -75,7 +75,7 @@ class StartScreen:
 
 
     def handlePlay(self):
-        self.switchScreen = "battle"
+        self.switchScreen = "mode"
 
     def handleSettings(self):
         pass

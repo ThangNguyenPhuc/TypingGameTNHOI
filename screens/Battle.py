@@ -5,9 +5,9 @@ import math
 
 #Open glossaries
 easyFile = open("assets/glossary/EASY.txt")
-# mediumFile = open("assets/glossary/MEDIUM.txt")
-# hardFile = open("assets/glossary/HARD.txt")
-# insaneFile = open("assets/glossary/INSANE.txt")
+mediumFile = open("assets/glossary/MEDIUM.txt")
+hardFile = open("assets/glossary/HARD.txt")
+insaneFile = open("assets/glossary/INSANE.txt")
 
 
 class Player:
@@ -23,9 +23,9 @@ class Enemy:
         self.word = word
         self.speed = None
         if (type == "plane"):
-            self.speed = 1
+            self.speed = 2
         else:
-            self.speed = 0.5
+            self.speed = 1.5
 
         self.state = 'moving'
 
@@ -44,6 +44,65 @@ class Explosion:
         self.type = type
         self.position = pos  
 
+class PauseDialog:
+    def __init__(self, screen):
+        self.screen = screen
+        self.state = "close"
+        self.quitBattle = False
+        self.restartBattle = False
+        
+        #Pause frames
+        self.pauseFrame = pygame.image.load('assets/images/pause-frame.png')
+
+        #Pause buttons
+        resumeImage = pygame.image.load("assets/images/button images/resume-button.png")
+        restartImage = pygame.image.load("assets/images/button images/restart-button.png")
+        quitImage = pygame.image.load("assets/images/button images/quit-button.png")
+
+
+        buttonX, buttonY = (1000 - resumeImage.get_width()) // 2, (800 - resumeImage.get_height()) // 2 - 60
+        delta = 100
+        self.resumeButton = Button(buttonX, buttonY, resumeImage)
+        self.restartButton = Button(buttonX, buttonY + delta,  restartImage)
+        self.quitButton = Button(buttonX, buttonY + 2 * delta, quitImage) 
+
+    def draw(self):
+        if self.state == "close":
+            return
+        
+        pauseX, pauseY = (1000 - self.pauseFrame.get_width()) // 2, (800 - self.pauseFrame.get_height()) // 2
+
+        self.screen.blit(self.pauseFrame, (pauseX, pauseY))
+        self.resumeButton.draw(self.screen)
+        self.restartButton.draw(self.screen)
+        self.quitButton.draw(self.screen)
+
+    def handleEvents(self, events):
+        if self.state == "close":
+            return
+        
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if self.resumeButton.clicked(event.pos):
+                        self.state = "close"
+                    if self.restartButton.clicked(event.pos):
+                        self.restartBattle = True
+                    if self.quitButton.clicked(event.pos):
+                        self.quitBattle = True
+
+class Button:
+    def __init__(self, x, y, image):
+        self.rect = image.get_rect(topleft=(x, y))  # Lấy rect từ kích thước của hình ảnh
+        self.image = image  # Lưu hình ảnh gốc
+
+    def draw(self, screen):
+        # Vẽ hình ảnh lên màn hình tại vị trí nút
+        screen.blit(self.image, self.rect)
+
+    def clicked(self, pos):
+        return self.rect.collidepoint(pos)
+
 class BattleScreen:
     def __init__(self, screen):
         self.screen = screen
@@ -52,7 +111,10 @@ class BattleScreen:
         self.font = pygame.font.SysFont("Arial", 50)    
         self.typedText = ""
 
+        self.PAUSE = PauseDialog(self.screen)
+
         self.player = Player()
+        self.score = 0
 
         self.sprites = []
         self.enemies = []
@@ -62,15 +124,28 @@ class BattleScreen:
         self.glossaries = []
 
         self.glossaries.append(easyFile.readlines())
+        self.glossaries.append(mediumFile.readlines())
+        self.glossaries.append(hardFile.readlines())
+        self.glossaries.append(insaneFile.readlines())
 
-        for idx in range(len(self.glossaries[0])):
-            self.glossaries[0][idx] = self.glossaries[0][idx][:-1]
+        for gidx in range(4):
+            for idx in range(len(self.glossaries[gidx])):
+                self.glossaries[gidx][idx] = self.glossaries[gidx][idx][:-1]
 
 
         self.switchScreen = "battle"
+        self.modeChosen = None
+    
+    def reset(self):
+        self.score = 0
+        self.typedText = ""
+        self.enemies.clear()
+        self.torpedoes.clear()
+        self.explosions.clear()
 
 
     def draw(self):
+        self.PAUSE.quitBattle = False
         self.screen.blit(self.backgroundImage, (0, 0))
 
         inputBox = pygame.Surface((600, 70), pygame.SRCALPHA)
@@ -81,6 +156,14 @@ class BattleScreen:
         player = pygame.image.load("assets/images/battle resources/player-character.png")
         player = pygame.transform.smoothscale(player, (100, 100))
         self.screen.blit(player, self.player.position)
+        
+
+
+        #Draw health bar
+        barLength = self.player.health * 6 // 5
+        healthBar = pygame.Surface((barLength, 20))
+        healthBar.fill((255, 0, 0))
+        self.screen.blit(healthBar, (200, 60))
 
         #Draw enemies
         for enemy in self.enemies:
@@ -103,11 +186,6 @@ class BattleScreen:
             self.screen.blit(enemyWord, wordPos)
             self.screen.blit(enemyImage, (enemy.x, enemy.y))
             
-        #Draw health bar
-        barLength = self.player.health * 6 // 5
-        healthBar = pygame.Surface((barLength, 20))
-        healthBar.fill((255, 0, 0))
-        self.screen.blit(healthBar, (200, 50))
 
         #Draw torpedoes
         for idx in range(len(self.torpedoes)):
@@ -125,7 +203,7 @@ class BattleScreen:
 
             curPos = A.lerp(B, torpedo.interpolate)
 
-            #Rotate 45 degrees
+            #Rotate 40 degrees
             torpedoImage = pygame.transform.rotate(torpedoImage, 40.0)
             rectBox = torpedoImage.get_rect(center=(curPos.x, curPos.y))
 
@@ -163,12 +241,13 @@ class BattleScreen:
 
         #Handle enemy events
         idx = 0
-        while idx < len(self.enemies):
+        while self.PAUSE.state == 'close' and idx < len(self.enemies):
             enemy = self.enemies[idx]
             #Word match with enemy words
             if self.typedText == enemy.word:
                 self.typedText = ""
                 self.enemies[idx].speed = 0   
+                self.score += (100 if enemy.type == "plane" else 50)
                 newTorpedo = Torpedo((250, 550), (enemy.x + 50, enemy.y + (50 if enemy.type == "plane" else 25)), enemy.word)     
                 self.torpedoes.append(newTorpedo) 
 
@@ -179,7 +258,9 @@ class BattleScreen:
                 idx += 1
             else:
                 self.enemies.pop(idx)
-                self.player.health -= 20
+                self.player.health -= 100
+                if (self.player.health == 0):
+                    self.switchScreen = "end"
             
         #Handle torpedo touch enemy
         idx1 = 0
@@ -208,23 +289,59 @@ class BattleScreen:
             if not popped:
                 idx1 += 1
 
+        #Render score
+        scoreFont = pygame.font.SysFont("Arial", 25)    
+        scoreText = scoreFont.render("SCORE: " + str(self.score), True, (0, 0, 0))
+        self.screen.blit(scoreText, (20, 60))
+
+        #Draw pause button
+        pauseImage = pygame.image.load("assets/images/button images/pause-button.png")
+        pauseImage = pygame.transform.smoothscale(pauseImage, (40, 40))
+
+        self.pauseButton = Button(900, 50, pauseImage)
+        self.pauseButton.draw(self.screen)
+
+        self.PAUSE.draw()
+
+
 
     def handleEvents(self, events):
+        self.PAUSE.handleEvents(events)
+        #Quit battle
+        if self.PAUSE.quitBattle:
+            self.PAUSE.state = "close"
+            self.switchScreen = 'start'
+            self.PAUSE.quitBattle = False
+            
+        #Restart battle
+        if self.PAUSE.restartBattle:
+            self.reset()
+            self.PAUSE.state = "close"
+            self.PAUSE.restartBattle = False
         for event in events:
-            if event.type == pygame.KEYDOWN:
+            if self.PAUSE.state == 'close' and event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     self.typedText = self.typedText[:-1]
                 elif 'a' <= event.unicode <= 'z' or event.unicode == ' ':
                     self.typedText += event.unicode
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if self.pauseButton.clicked(event.pos):
+                        self.PAUSE.state = "open"
+
+
         textShow = self.font.render(self.typedText, True, (255, 255, 255))
         self.screen.blit(textShow, (210, 605))
 
     def spawnEnemy(self):
+        if self.PAUSE.state == "open":
+            return
+            
         enemyType = random.randint(0, 1)
         rand_y = None
         
-        newWord = self.glossaries[0][random.randint(0, len(self.glossaries[0]) - 1)]
+        newWord = self.glossaries[self.modeChosen][random.randint(0, len(self.glossaries[self.modeChosen]) - 1)]
 
         if enemyType:
             rand_y = random.randint(70, 300)

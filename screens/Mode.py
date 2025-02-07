@@ -12,15 +12,13 @@ class Frame:
 
 
 class Button:
-    def __init__(self, x, y, image, action):
+    def __init__(self, x, y, image):
         self.rect = image.get_rect(topleft = (x, y))
         self.image = image
-        self.action = action
+
     def draw(self, screen):
         screen.blit(self.image, self.rect)
-    def click(self, mouse_pos):
-        if self.rect.collidepoint(mouse_pos):
-            self.action()
+
 
 class ModeScreen:
     def __init__(self, screen):
@@ -28,6 +26,7 @@ class ModeScreen:
         self.background_image = pygame.image.load("assets/images/start-background.jpg")
         self.background_image = pygame.transform.scale(self.background_image, (screen_width, screen_height))
         self.switchScreen = "mode"
+        self.modeChosen = None
         
 
     def draw(self):
@@ -37,9 +36,9 @@ class ModeScreen:
         #Load button images
         difficulties_box_image = pygame.image.load("assets/images/difficulties images/difficulties-box.png")
         easy_image = pygame.image.load("assets/images/difficulties images/easy-button.png")
+        medium_image = pygame.image.load("assets/images/difficulties images/medium-button.png")
         hard_image = pygame.image.load("assets/images/difficulties images/hard-button.png")
         insane_image = pygame.image.load("assets/images/difficulties images/insane-button.png")
-        medium_image = pygame.image.load("assets/images/difficulties images/medium-button.png")
         
         frame_width, frame_height = difficulties_box_image.get_width(), difficulties_box_image.get_height()
         frame_x, frame_y = (screen_width - frame_width) // 2, (screen_height - frame_height) // 2 
@@ -51,17 +50,17 @@ class ModeScreen:
         delta = 90
 
         #Create buttons
-        self.easy_button = Button(button_x, button_y, easy_image, easy_action)
-        self.hard_button = Button(button_x, button_y + delta, hard_image, hard_action)
-        self.insane_button = Button(button_x, button_y + 2*delta, insane_image, insane_action)
-        self.medium_button = Button(button_x, button_y + 3*delta, medium_image, medium_action)
+        self.easy_button = Button(button_x, button_y, easy_image)
+        self.medium_button = Button(button_x, button_y + delta, medium_image)
+        self.hard_button = Button(button_x, button_y + 2 * delta, hard_image)
+        self.insane_button = Button(button_x, button_y + 3 * delta, insane_image)
 
         #Draw button
         difficulties_box.draw(self.screen)
         self.easy_button.draw(self.screen)
+        self.medium_button.draw(self.screen)
         self.hard_button.draw(self.screen)
         self.insane_button.draw(self.screen)
-        self.medium_button.draw(self.screen)
 
     def handleEvents(self, events):
         for event in events:
@@ -79,14 +78,19 @@ class ModeScreen:
     def clicked(self, button, pos):
         return button.rect.collidepoint(pos)
 
-    def easy_action():
-        print("I am very sad")
+    def easy_action(self):
+        self.switchScreen = "battle"
+        self.modeChosen = 0
 
-    def hard_action():
-        print("I don't want to go to school")
+    def medium_action(self):
+        self.switchScreen = "battle"
+        self.modeChosen = 1
+        
+    def hard_action(self):
+        self.switchScreen = "battle"
+        self.modeChosen = 2
 
-    def insane_action():
-        print("i cry a lot")
-
-    def medium_action():
-        print("i don't want to do anything")
+    def insane_action(self):
+        self.switchScreen = "battle"
+        self.modeChosen = 3
+    
