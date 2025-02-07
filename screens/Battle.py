@@ -3,6 +3,8 @@ import sys
 import random
 import math
 
+pygame.mixer.init()
+
 #Open glossaries
 easyFile = open("assets/glossary/EASY.txt")
 mediumFile = open("assets/glossary/MEDIUM.txt")
@@ -50,6 +52,8 @@ class PauseDialog:
         self.state = "close"
         self.quitBattle = False
         self.restartBattle = False
+        self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
+
         
         #Pause frames
         self.pauseFrame = pygame.image.load('assets/images/pause-frame.png')
@@ -85,10 +89,13 @@ class PauseDialog:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.resumeButton.clicked(event.pos):
+                        self.clickEffect.play()
                         self.state = "close"
                     if self.restartButton.clicked(event.pos):
+                        self.clickEffect.play()
                         self.restartBattle = True
                     if self.quitButton.clicked(event.pos):
+                        self.clickEffect.play()
                         self.quitBattle = True
 
 class Button:
@@ -108,7 +115,7 @@ class BattleScreen:
         self.screen = screen
         self.backgroundImage = pygame.image.load("assets/images/battle-background.jpg")
         self.backgroundImage = pygame.transform.smoothscale(self.backgroundImage, (1000, 800))
-        self.font = pygame.font.SysFont("Arial", 50)    
+        self.font = pygame.font.Font("assets/fonts/Montserrat-ExtraBold.ttf", 50)    
         self.typedText = ""
 
         self.PAUSE = PauseDialog(self.screen)
@@ -135,13 +142,17 @@ class BattleScreen:
 
         self.switchScreen = "battle"
         self.modeChosen = None
-    
+
+        self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
+        self.explodeSound = pygame.mixer.Sound("assets/sounds/explode.mp3")
+
     def reset(self):
         self.score = 0
         self.typedText = ""
         self.enemies.clear()
         self.torpedoes.clear()
         self.explosions.clear()
+        self.player.health = 500
 
 
     def draw(self):
@@ -176,7 +187,7 @@ class BattleScreen:
                 enemyImage = pygame.transform.smoothscale(enemyImage, (100, 50))
 
             #Create word on screen
-            enemyFont = pygame.font.SysFont("Arial", 30)
+            enemyFont = pygame.font.Font("assets/fonts/Montserrat-ExtraBold.ttf", 30)
             enemyWord = enemyFont.render(enemy.word, True, (255, 0, 0))
 
             #Define word postition
@@ -279,6 +290,7 @@ class BattleScreen:
                 if torpedo.target == enemy.word and torpedo.interpolate == 1.0:
                     #Explode animation
                     newExplosion = Explosion((enemy.x, enemy.y - (50 if enemy.type == 'ship' else 0)), enemy.type, pygame.time.get_ticks())
+                    self.explodeSound.play()
                     self.explosions.append(newExplosion)
                     self.torpedoes.pop(idx1)
                     self.enemies.pop(idx2)
@@ -290,7 +302,7 @@ class BattleScreen:
                 idx1 += 1
 
         #Render score
-        scoreFont = pygame.font.SysFont("Arial", 25)    
+        scoreFont = pygame.font.Font("assets/fonts/Montserrat-ExtraBold.ttf", 25)    
         scoreText = scoreFont.render("SCORE: " + str(self.score), True, (0, 0, 0))
         self.screen.blit(scoreText, (20, 60))
 
@@ -328,6 +340,7 @@ class BattleScreen:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.pauseButton.clicked(event.pos):
+                        self.clickEffect.play()
                         self.PAUSE.state = "open"
 
 
@@ -337,17 +350,17 @@ class BattleScreen:
     def spawnEnemy(self):
         if self.PAUSE.state == "open":
             return
-            
+
         enemyType = random.randint(0, 1)
         rand_y = None
         
         newWord = self.glossaries[self.modeChosen][random.randint(0, len(self.glossaries[self.modeChosen]) - 1)]
 
         if enemyType:
-            rand_y = random.randint(70, 300)
+            rand_y = random.randint(95, 300)
             newEnemy = Enemy("plane", 900, rand_y, newWord)
             self.enemies.append(newEnemy)
         else:
-            rand_y = random.randint(420, 600)
+            rand_y = random.randint(420, 550)
             newEnemy = Enemy("ship", 900, rand_y, newWord)
             self.enemies.append(newEnemy)

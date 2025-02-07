@@ -2,6 +2,7 @@ import pygame
 import sys
 
 screen_width, screen_height = 1000, 800
+pygame.mixer.init()
 
 class Frame:
     def __init__(self, x, y, image):
@@ -28,6 +29,8 @@ class ModeScreen:
         self.switchScreen = "mode"
         self.modeChosen = None
         
+        self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
+
 
     def draw(self):
         #Draw background 
@@ -39,7 +42,8 @@ class ModeScreen:
         medium_image = pygame.image.load("assets/images/difficulties images/medium-button.png")
         hard_image = pygame.image.load("assets/images/difficulties images/hard-button.png")
         insane_image = pygame.image.load("assets/images/difficulties images/insane-button.png")
-        
+        back_image = pygame.image.load('assets/images/button images/back-button.png')
+
         frame_width, frame_height = difficulties_box_image.get_width(), difficulties_box_image.get_height()
         frame_x, frame_y = (screen_width - frame_width) // 2, (screen_height - frame_height) // 2 
         difficulties_box = Frame(frame_x, frame_y, difficulties_box_image)
@@ -54,6 +58,7 @@ class ModeScreen:
         self.medium_button = Button(button_x, button_y + delta, medium_image)
         self.hard_button = Button(button_x, button_y + 2 * delta, hard_image)
         self.insane_button = Button(button_x, button_y + 3 * delta, insane_image)
+        self.back_button = Button(30, 50, back_image)
 
         #Draw button
         difficulties_box.draw(self.screen)
@@ -61,19 +66,27 @@ class ModeScreen:
         self.medium_button.draw(self.screen)
         self.hard_button.draw(self.screen)
         self.insane_button.draw(self.screen)
+        self.back_button.draw(self.screen)
 
     def handleEvents(self, events):
         for event in events:
             if (event.type == pygame.MOUSEBUTTONDOWN):
                 if (event.button == 1):
                     if self.clicked(self.easy_button, event.pos):
+                        self.clickEffect.play()
                         self.easy_action()
                     if self.clicked(self.medium_button, event.pos):
+                        self.clickEffect.play()
                         self.medium_action()
                     if self.clicked(self.hard_button, event.pos):
+                        self.clickEffect.play()
                         self.hard_action()
                     if self.clicked(self.insane_button, event.pos):
+                        self.clickEffect.play()
                         self.insane_action()
+                    if self.clicked(self.back_button, event.pos):
+                        self.clickEffect.play()
+                        self.back_action()
 
     def clicked(self, button, pos):
         return button.rect.collidepoint(pos)
@@ -93,4 +106,7 @@ class ModeScreen:
     def insane_action(self):
         self.switchScreen = "battle"
         self.modeChosen = 3
+
+    def back_action(self):
+        self.switchScreen = "start"
     

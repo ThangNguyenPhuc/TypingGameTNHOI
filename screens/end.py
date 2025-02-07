@@ -1,6 +1,8 @@
 import pygame
 import symtable
 
+pygame.mixer.init()
+
 class Button: 
     def __init__(self, x, y, image): 
         self.rect = image.get_rect(topleft = (x,y)) 
@@ -17,9 +19,12 @@ class EndScreen:
         self.background_image = pygame.transform.scale(self.background_image, (1000, 800))
         self.switchScreen = "end"
         self.score = None
+
+        self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
+
     
     def draw(self):
-        font = pygame.font.SysFont("Arial", 40)
+        font = pygame.font.Font("assets/fonts/Montserrat-ExtraBold.ttf", 40)
         SCORE = font.render(str(self.score), True, (17, 98, 132))
 
         #Draw background and game title
@@ -47,9 +52,11 @@ class EndScreen:
         for event in events: 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.clicked(self.menu_button, event.pos):
+                    self.clickEffect.play()
                     self.handleMenu()
                 if self.clicked(self.restart_button, event.pos):
-                    self.handleBattle() 
+                    self.clickEffect.play()
+                    self.handleRestart() 
     
     def clicked(self, button, pos):
         return button.rect.collidepoint(pos)
@@ -57,6 +64,6 @@ class EndScreen:
     def handleMenu(self):
         self.switchScreen = "start"
     
-    def handleBattle(self):
-        self.switchScreen = "battle"
+    def handleRestart(self):
+        self.switchScreen = "mode"
     

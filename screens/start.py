@@ -2,6 +2,8 @@ import pygame
 import sys
 
 
+pygame.mixer.init()
+
 class Button:
     def __init__(self, x, y, image):
         self.rect = image.get_rect(topleft=(x, y))  # Lấy rect từ kích thước của hình ảnh
@@ -21,6 +23,9 @@ class StartScreen:
         self.background_image = pygame.image.load("assets/images/start-background.jpg")
         self.background_image = pygame.transform.scale(self.background_image, (1000, 800))
         self.switchScreen = "start"
+
+        self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
+
     
     def draw(self):
         game_title_image = pygame.image.load("assets/images/name-game.png")
@@ -61,12 +66,16 @@ class StartScreen:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.clicked(self.play_button, event.pos):
+                        self.clickEffect.play()
                         self.handlePlay()
                     if self.clicked(self.settings_button, event.pos):
+                        self.clickEffect.play()
                         self.handleSettings()
                     if self.clicked(self.guide_button, event.pos):
+                        self.clickEffect.play()                   
                         self.handleGuide()
                     if self.clicked(self.quit_button, event.pos):
+                        self.clickEffect.play()
                         self.handleQuit()
 
     def clicked(self, button, pos):
