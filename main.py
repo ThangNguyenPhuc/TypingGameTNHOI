@@ -2,11 +2,13 @@ import pygame
 import sys
 from screens.Start import StartScreen
 from screens.Battle import BattleScreen
-from screens.Pause import PauseScreen
-
+from screens.Mode import ModeScreen
+from screens.end import EndScreen
 
 pygame.init()
+pygame.mixer.init()
 pygame.key.set_repeat(300, 100)
+
 
 #Initialize clock
 clock = pygame.time.Clock()
@@ -17,21 +19,73 @@ pygame.display.set_caption("TYPING ARMADA")
 
 #Battle Screen Customize Events
 ADDENEMY = pygame.USEREVENT + 1
-pygame.time.set_timer(ADDENEMY, 4000)
+pygame.time.set_timer(ADDENEMY, 2000)
 
 
 #Initialize screens
 START = StartScreen(screen)
 BATTLE = BattleScreen(screen)
-PAUSE = PauseScreen(screen)
+MODE = ModeScreen(screen)
+END = EndScreen(screen)
 
 screenList = {
     "start" : START,
     "battle" : BATTLE,
-    "pause" : PAUSE
+    "mode" : MODE,
+    "end" : END
 }
 
+
+#Music Setup
+START_THEME = "assets/sounds/start_theme.mp3"
+BATTLE_THEME = "assets/sounds/battle_theme.mp3"
+
+def play_music(theme):
+    pygame.mixer.music.load(theme)
+    pygame.mixer.music.play(-1)
+
+play_music(START_THEME)
+
+
+def switchScreen(curScreen, u, v):
+
+    if u == v:
+        return curScreen
+
+    #Tracking mode chosen
+    diff = None
+    if u == "mode":
+        diff = curScreen.modeChosen
+
+    #Getting score
+    score = None
+    if u == "battle":
+        score = curScreen.score
+
+    curScreen.switchScreen = u
+
+    #Switch screen
+    curScreen = screenList[v]    
+
+    if v == "battle":
+        curScreen.modeChosen = diff
+        curScreen.reset()
+        play_music(BATTLE_THEME)
+
+    if v == "start" and u == "battle":
+        play_music(START_THEME)
+
+    if v == "end":
+        curScreen.score = score
+        play_music(START_THEME)
+
+    curScreen.switchScreen = v
+    
+
+    return curScreen
+
 curScreen = START
+
 
 #Game run
 run = True
@@ -48,17 +102,18 @@ while run:
 
     curTime = pygame.time.get_ticks() / 1000
 
-    #Switch screen
-    if curScreen.switchScreen == "quit":
-        run = False
 
-    curScreen = screenList[curScreen.switchScreen]
-    
-
+    u = curScreen.switchScreen
     curScreen.draw()
     curScreen.handleEvents(events)
+    v = curScreen.switchScreen
 
-    
+    if v == 'quit':
+        run = False
+        break
+
+    curScreen = switchScreen(curScreen, u, v)
+
     pygame.display.flip()
     clock.tick(60)
 
