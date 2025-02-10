@@ -4,6 +4,7 @@ from screens.Start import StartScreen
 from screens.Battle import BattleScreen
 from screens.Mode import ModeScreen
 from screens.end import EndScreen
+from screens.Settings import SettingScreen
 
 pygame.init()
 pygame.mixer.init()
@@ -27,12 +28,14 @@ START = StartScreen(screen)
 BATTLE = BattleScreen(screen)
 MODE = ModeScreen(screen)
 END = EndScreen(screen)
+SETTING = SettingScreen(screen)
 
 screenList = {
     "start" : START,
     "battle" : BATTLE,
     "mode" : MODE,
-    "end" : END
+    "end" : END,
+    "setting" :  SETTING
 }
 
 
