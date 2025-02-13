@@ -5,6 +5,8 @@ from screens.Battle import BattleScreen
 from screens.Mode import ModeScreen
 from screens.end import EndScreen
 from screens.Settings import SettingScreen
+from screens.Guide import GuideScreen
+
 
 pygame.init()
 pygame.mixer.init()
@@ -29,13 +31,15 @@ BATTLE = BattleScreen(screen)
 MODE = ModeScreen(screen)
 END = EndScreen(screen)
 SETTING = SettingScreen(screen)
+GUIDE = GuideScreen(screen)
 
 screenList = {
     "start" : START,
     "battle" : BATTLE,
     "mode" : MODE,
     "end" : END,
-    "setting" :  SETTING
+    "setting" :  SETTING,
+    "guide" : GUIDE
 }
 
 
@@ -43,11 +47,16 @@ screenList = {
 START_THEME = "assets/sounds/start_theme.mp3"
 BATTLE_THEME = "assets/sounds/battle_theme.mp3"
 
+#Volum setup
+VOLUME = 1.0
+
 def play_music(theme):
     pygame.mixer.music.load(theme)
     pygame.mixer.music.play(-1)
 
+pygame.mixer.music.set_volume(1.0)
 play_music(START_THEME)
+
 
 
 def switchScreen(curScreen, u, v):
@@ -83,7 +92,7 @@ def switchScreen(curScreen, u, v):
         play_music(START_THEME)
 
     curScreen.switchScreen = v
-    
+    curScreen.volume = VOLUME
 
     return curScreen
 
@@ -109,6 +118,9 @@ while run:
     u = curScreen.switchScreen
     curScreen.draw()
     curScreen.handleEvents(events)
+    if u == "setting":
+        VOLUME = curScreen.volume
+        pygame.mixer.music.set_volume(VOLUME)
     v = curScreen.switchScreen
 
     if v == 'quit':
