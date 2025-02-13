@@ -25,9 +25,9 @@ class Enemy:
         self.word = word
         self.speed = None
         if (type == "plane"):
-            self.speed = 2
-        else:
             self.speed = 1.5
+        else:
+            self.speed = 1.0
 
         self.state = 'moving'
 
@@ -361,8 +361,10 @@ class BattleScreen:
         if enemyType:
             rand_y = random.randint(95, 300)
             newEnemy = Enemy("plane", 900, rand_y, newWord)
+            newEnemy.speed += 0.2 * (self.score // 500)
             self.enemies.append(newEnemy)
         else:
             rand_y = random.randint(420, 550)
             newEnemy = Enemy("ship", 900, rand_y, newWord)
+            newEnemy.speed += 0.2 * (self.score // 500)
             self.enemies.append(newEnemy)
