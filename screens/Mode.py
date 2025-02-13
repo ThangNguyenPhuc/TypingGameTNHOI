@@ -29,6 +29,7 @@ class ModeScreen:
         self.switchScreen = "mode"
         self.modeChosen = None
         
+        self.volume = 1.0
         self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
 
 
@@ -72,6 +73,7 @@ class ModeScreen:
         for event in events:
             if (event.type == pygame.MOUSEBUTTONDOWN):
                 if (event.button == 1):
+                    self.clickEffect.set_volume(self.volume)
                     if self.clicked(self.easy_button, event.pos):
                         self.clickEffect.play()
                         self.easy_action()

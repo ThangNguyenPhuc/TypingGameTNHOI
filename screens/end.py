@@ -1,5 +1,4 @@
 import pygame
-import symtable
 
 pygame.mixer.init()
 
@@ -20,6 +19,7 @@ class EndScreen:
         self.switchScreen = "end"
         self.score = None
 
+        self.volume = 1.0
         self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
 
     
@@ -51,12 +51,14 @@ class EndScreen:
     def handleEvents(self, events):
         for event in events: 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.clicked(self.menu_button, event.pos):
-                    self.clickEffect.play()
-                    self.handleMenu()
-                if self.clicked(self.restart_button, event.pos):
-                    self.clickEffect.play()
-                    self.handleRestart() 
+                if event.button == 1:
+                    self.clickEffect.set_volume(self.volume)
+                    if self.clicked(self.menu_button, event.pos):
+                        self.clickEffect.play()
+                        self.handleMenu()
+                    if self.clicked(self.restart_button, event.pos):
+                        self.clickEffect.play()
+                        self.handleRestart() 
     
     def clicked(self, button, pos):
         return button.rect.collidepoint(pos)

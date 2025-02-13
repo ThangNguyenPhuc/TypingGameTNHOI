@@ -24,6 +24,7 @@ class StartScreen:
         self.background_image = pygame.transform.scale(self.background_image, (1000, 800))
         self.switchScreen = "start"
 
+        self.volume = 1.0
         self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
 
     
@@ -65,6 +66,7 @@ class StartScreen:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    self.clickEffect.set_volume(self.volume)
                     if self.clicked(self.play_button, event.pos):
                         self.clickEffect.play()
                         self.handlePlay()
@@ -87,10 +89,10 @@ class StartScreen:
         self.switchScreen = "mode"
 
     def handleSettings(self):
-        pass
+        self.switchScreen = "setting"
 
     def handleGuide(self):
-        pass
+        self.switchScreen = "guide"
 
     def handleQuit(self):
         self.switchScreen = "quit"

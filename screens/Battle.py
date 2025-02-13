@@ -143,6 +143,7 @@ class BattleScreen:
         self.switchScreen = "battle"
         self.modeChosen = None
 
+        self.volume = 1.0
         self.clickEffect = pygame.mixer.Sound("assets/sounds/button_clicked.mp3")
         self.explodeSound = pygame.mixer.Sound("assets/sounds/explode.mp3")
 
@@ -339,6 +340,7 @@ class BattleScreen:
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    self.clickEffect.set_volume(self.volume)
                     if self.pauseButton.clicked(event.pos):
                         self.clickEffect.play()
                         self.PAUSE.state = "open"
