@@ -6,6 +6,7 @@ from screens.Mode import ModeScreen
 from screens.end import EndScreen
 from screens.Settings import SettingScreen
 from screens.Guide import GuideScreen
+from screens.NewPlayer import NewPlayerScreen
 
 
 pygame.init()
@@ -32,6 +33,7 @@ MODE = ModeScreen(screen)
 END = EndScreen(screen)
 SETTING = SettingScreen(screen)
 GUIDE = GuideScreen(screen)
+NEWPLAYER = NewPlayerScreen(screen)
 
 screenList = {
     "start" : START,
@@ -39,7 +41,8 @@ screenList = {
     "mode" : MODE,
     "end" : END,
     "setting" :  SETTING,
-    "guide" : GUIDE
+    "guide" : GUIDE,
+    "newplayer": NEWPLAYER
 }
 
 
@@ -57,9 +60,12 @@ def play_music(theme):
 pygame.mixer.music.set_volume(1.0)
 play_music(START_THEME)
 
-
+firstTime = True
+firstGuide = True
 
 def switchScreen(curScreen, u, v):
+    global firstTime
+    global firstGuide
 
     if u == v:
         return curScreen
@@ -75,6 +81,19 @@ def switchScreen(curScreen, u, v):
         score = curScreen.score
 
     curScreen.switchScreen = u
+
+    if v == "newplayer":
+        if not firstTime:
+            v = "mode"
+        else:
+            firstTime = False
+
+    if u == 'start' and v == 'guide':
+        firstGuide = False
+
+    if u == "guide" and firstGuide:            
+        v = 'mode'
+        firstGuide = False
 
     #Switch screen
     curScreen = screenList[v]    

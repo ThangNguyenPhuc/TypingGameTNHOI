@@ -86,7 +86,7 @@ class StartScreen:
 
 
     def handlePlay(self):
-        self.switchScreen = "mode"
+        self.switchScreen = "newplayer"
 
     def handleSettings(self):
         self.switchScreen = "setting"
